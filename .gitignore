@@ -1,1 +1,3 @@
 shared/data
+shared/models_trained/vgg19_finetuned.h5
+shared/models_trained/custom_cnn.h5
