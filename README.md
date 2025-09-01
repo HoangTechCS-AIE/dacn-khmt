@@ -28,6 +28,7 @@ plantvillage_full_fe_server/
 ├── shared/
 │   ├── data/
 │   └── images_readme/
+│   └── models_trained/
 └── requirements.txt
 └── .gitignore
 ```
