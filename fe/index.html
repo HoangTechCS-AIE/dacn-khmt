@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Phát Hiện Bệnh Trên Lá Cây</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'leaf-green': '#22c55e',
+                        'forest-green': '#16a34a',
+                        'sage-green': '#84cc16',
+                        'earth-brown': '#a3a3a3'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-leaf-green">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-leaf-green rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">PlantCare AI</h1>
+                        <p class="text-sm text-gray-600">Hệ thống phát hiện bệnh trên lá cây thông minh</p>
+                    </div>
+                </div>
+                <nav class="flex space-x-4">
+                    <button onclick="showSection('analysis')" class="nav-btn bg-leaf-green text-white px-4 py-2 rounded-lg font-medium hover:bg-forest-green transition-colors">
+                        Phân Tích
+                    </button>
+                    <button onclick="showSection('history')" class="nav-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                        Lịch Sử
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Analysis Section -->
+        <div id="analysis-section" class="section">
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Upload Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 border border-green-100">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <svg class="w-6 h-6 text-leaf-green mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Tải Ảnh Lên
+                    </h2>
+                    
+                    <!-- Model Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Chọn Model AI</label>
+                        <select id="modelSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-leaf-green focus:border-transparent">
+                            <option value="custom-cnn">Custom CNN </option>
+                            <option value="vgg19">VGG19 </option>
+                        </select>
+                        <div id="modelInfo" class="mt-2 p-3 bg-green-50 rounded-lg text-sm text-green-700"></div>
+                    </div>
+
+                    <!-- Upload Area -->
+                    <div id="uploadArea" class="border-2 border-dashed border-green-300 rounded-xl p-8 text-center hover:border-leaf-green transition-colors cursor-pointer">
+                        <svg class="mx-auto h-12 w-12 text-green-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        <p class="text-lg font-medium text-gray-900 mb-2">Kéo thả ảnh vào đây</p>
+                        <p class="text-sm text-gray-500 mb-4">hoặc nhấn để chọn file</p>
+                        <button class="bg-leaf-green text-white px-6 py-2 rounded-lg hover:bg-forest-green transition-colors">
+                            Chọn Ảnh
+                        </button>
+                    </div>
+                    
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                    
+                    <!-- Preview -->
+                    <div id="imagePreview" class="mt-6 hidden">
+                        <img id="previewImg" class="w-full h-64 object-cover rounded-lg border-2 border-green-200">
+                        <button id="analyzeBtn" class="w-full mt-4 bg-leaf-green text-white py-3 px-6 rounded-lg font-medium hover:bg-forest-green transition-colors flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                            Phân Tích Ảnh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 border border-green-100">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <svg class="w-6 h-6 text-leaf-green mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Kết Quả Phân Tích
+                    </h2>
+                    
+                    <div id="resultsContainer" class="text-center text-gray-500">
+                        <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <p>Tải ảnh lên để bắt đầu phân tích</p>
+                    </div>
+
+                    <div id="loadingState" class="hidden text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-leaf-green mx-auto mb-4"></div>
+                        <p class="text-gray-600">Đang phân tích ảnh...</p>
+                    </div>
+
+                    <div id="analysisResults" class="hidden">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="history-section" class="section hidden">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-green-100">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <svg class="w-6 h-6 text-leaf-green mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Lịch Sử Phân Tích
+                </h2>
+                
+                <div id="historyContainer">
+                    <!-- History items will be populated here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Disease database with Vietnamese names and treatments
+        const diseases = {
+            'Pepper_bell_Bacterial_spot': {
+                name: 'Đốm vi khuẩn trên ớt chuông',
+                severity: 'Trung bình',
+                treatment: 'Sử dụng thuốc kháng sinh đồng, cải thiện thoát nước và tránh tưới nước lên lá.',
+                prevention: 'Luân canh cây trồng, khử trùng dụng cụ, tránh làm việc khi lá ướt.'
+            },
+            'Pepper_bell_healthy': {
+                name: 'Ớt chuông khỏe mạnh',
+                severity: 'Không có bệnh',
+                treatment: 'Không cần điều trị. Tiếp tục chăm sóc bình thường.',
+                prevention: 'Duy trì chế độ tưới nước và bón phân hợp lý.'
+            },
+            'Potato_Early_blight': {
+                name: 'Bệnh cháy lá sớm trên khoai tây',
+                severity: 'Nghiêm trọng',
+                treatment: 'Phun thuốc diệt nấm chứa chlorothalonil hoặc mancozeb.',
+                prevention: 'Luân canh, loại bỏ cây bệnh, cải thiện thông gió.'
+            },
+            'Potato_Late_blight': {
+                name: 'Bệnh cháy lá muộn trên khoai tây',
+                severity: 'Rất nghiêm trọng',
+                treatment: 'Sử dụng thuốc diệt nấm systemic như metalaxyl-M.',
+                prevention: 'Tránh tưới nước vào buổi tối, đảm bảo thoát nước tốt.'
+            },
+            'Potato_healthy': {
+                name: 'Khoai tây khỏe mạnh',
+                severity: 'Không có bệnh',
+                treatment: 'Không cần điều trị. Tiếp tục chăm sóc bình thường.',
+                prevention: 'Duy trì chế độ chăm sóc hiện tại.'
+            },
+            'Tomato_Bacterial_spot': {
+                name: 'Đốm vi khuẩn trên cà chua',
+                severity: 'Trung bình',
+                treatment: 'Phun thuốc kháng sinh đồng, cải thiện lưu thông không khí.',
+                prevention: 'Tránh tưới nước lên lá, khử trùng dụng cụ.'
+            },
+            'Tomato_Early_blight': {
+                name: 'Bệnh cháy lá sớm trên cà chua',
+                severity: 'Nghiêm trọng',
+                treatment: 'Sử dụng thuốc diệt nấm chứa chlorothalonil.',
+                prevention: 'Luân canh, loại bỏ tàn dư thực vật.'
+            },
+            'Tomato_Late_blight': {
+                name: 'Bệnh cháy lá muộn trên cà chua',
+                severity: 'Rất nghiêm trọng',
+                treatment: 'Phun thuốc diệt nấm systemic ngay lập tức.',
+                prevention: 'Kiểm soát độ ẩm, tránh tưới nước vào buổi tối.'
+            },
+            'Tomato_Leaf_Mold': {
+                name: 'Nấm mốc lá cà chua',
+                severity: 'Trung bình',
+                treatment: 'Cải thiện thông gió, sử dụng thuốc diệt nấm.',
+                prevention: 'Giảm độ ẩm trong nhà kính, tăng khoảng cách trồng.'
+            },
+            'Tomato_Septoria_leaf_spot': {
+                name: 'Đốm lá Septoria trên cà chua',
+                severity: 'Trung bình',
+                treatment: 'Phun thuốc diệt nấm chứa copper hoặc chlorothalonil.',
+                prevention: 'Loại bỏ lá bệnh, tránh tưới nước lên lá.'
+            },
+            'Tomato_Spider_mites_Two_spotted_spider_mite': {
+                name: 'Nhện đỏ hai chấm trên cà chua',
+                severity: 'Trung bình',
+                treatment: 'Sử dụng thuốc diệt nhện hoặc xà phòng côn trùng.',
+                prevention: 'Duy trì độ ẩm cao, sử dụng thiên địch tự nhiên.'
+            },
+            'Tomato_Target_Spot': {
+                name: 'Đốm mục tiêu trên cà chua',
+                severity: 'Nghiêm trọng',
+                treatment: 'Phun thuốc diệt nấm chứa azoxystrobin.',
+                prevention: 'Cải thiện thoát nước, luân canh cây trồng.'
+            },
+            'Tomato_Tomato_YellowLeaf_Curl_Virus': {
+                name: 'Virus cuộn lá vàng cà chua',
+                severity: 'Rất nghiêm trọng',
+                treatment: 'Không có thuốc điều trị. Loại bỏ cây bệnh ngay.',
+                prevention: 'Kiểm soát ruồi trắng, sử dụng giống kháng bệnh.'
+            },
+            'Tomato_Tomato_mosaic_virus': {
+                name: 'Virus khảm cà chua',
+                severity: 'Nghiêm trọng',
+                treatment: 'Loại bỏ cây bệnh, khử trùng dụng cụ.',
+                prevention: 'Sử dụng hạt giống sạch, tránh tiếp xúc với cây bệnh.'
+            },
+            'Tomato_healthy': {
+                name: 'Cà chua khỏe mạnh',
+                severity: 'Không có bệnh',
+                treatment: 'Không cần điều trị. Tiếp tục chăm sóc bình thường.',
+                prevention: 'Duy trì chế độ chăm sóc hiện tại.'
+            }
+        };
+
+        // Model information
+        const models = {
+            'custom-cnn': {
+                name: 'Custom CNN',
+                accuracy: '88.5%',
+                speed: 'Nhanh',
+                description: 'Mạng nơ-ron tích chập tùy chỉnh, được huấn luyện đặc biệt cho bệnh cây trồng.',
+                confidence: 0.94
+            },
+            'vgg19': {
+                name: 'VGG19',
+                accuracy: '91.4%',
+                speed: 'Trung bình',
+                description: 'Mô hình VGG19 - độ chính xác cao và ổn định.',
+                confidence: 0.962
+            }
+        };
+
+        let currentImage = null;
+        let analysisHistory = JSON.parse(localStorage.getItem('plantAnalysisHistory') || '[]');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateModelInfo();
+            loadHistory();
+        });
+
+        function setupEventListeners() {
+            const uploadArea = document.getElementById('uploadArea');
+            const imageInput = document.getElementById('imageInput');
+            const modelSelect = document.getElementById('modelSelect');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            uploadArea.addEventListener('click', () => imageInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            imageInput.addEventListener('change', handleImageSelect);
+            modelSelect.addEventListener('change', updateModelInfo);
+            analyzeBtn.addEventListener('click', analyzeImage);
+        }
+
+        function updateModelInfo() {
+            const selectedModel = document.getElementById('modelSelect').value;
+            const modelInfo = models[selectedModel];
+            const infoDiv = document.getElementById('modelInfo');
+            
+            infoDiv.innerHTML = `
+                <strong>${modelInfo.name}</strong><br>
+                Độ chính xác: ${modelInfo.accuracy} | Tốc độ: ${modelInfo.speed}<br>
+                ${modelInfo.description}
+            `;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('border-leaf-green', 'bg-green-50');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('border-leaf-green', 'bg-green-50');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                displayImage(files[0]);
+            }
+        }
+
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                displayImage(file);
+            }
+        }
+
+        function displayImage(file) {
+            currentImage = file;
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('previewImg');
+                const imagePreview = document.getElementById('imagePreview');
+                
+                previewImg.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function analyzeImage() {
+            if (!currentImage) return;
+
+            const loadingState = document.getElementById('loadingState');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const analysisResults = document.getElementById('analysisResults');
+
+            // Show loading
+            resultsContainer.classList.add('hidden');
+            analysisResults.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+
+            // Simulate analysis
+            setTimeout(() => {
+                const selectedModel = document.getElementById('modelSelect').value;
+                const modelInfo = models[selectedModel];
+                
+                // Random disease selection for demo
+                const diseaseKeys = Object.keys(diseases);
+                const randomDisease = diseaseKeys[Math.floor(Math.random() * diseaseKeys.length)];
+                const disease = diseases[randomDisease];
+                
+                // Calculate confidence based on model
+                const baseConfidence = modelInfo.confidence;
+                const confidence = (baseConfidence + Math.random() * 0.05 - 0.025).toFixed(3);
+                
+                const result = {
+                    id: Date.now(),
+                    timestamp: new Date().toLocaleString('vi-VN'),
+                    image: document.getElementById('previewImg').src,
+                    disease: randomDisease,
+                    diseaseInfo: disease,
+                    confidence: confidence,
+                    model: selectedModel,
+                    modelInfo: modelInfo
+                };
+
+                displayResults(result);
+                saveToHistory(result);
+                
+                loadingState.classList.add('hidden');
+            }, 2000);
+        }
+
+        function displayResults(result) {
+            const analysisResults = document.getElementById('analysisResults');
+            const severityColor = getSeverityColor(result.diseaseInfo.severity);
+            
+            analysisResults.innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${severityColor}">
+                            ${result.diseaseInfo.severity}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">${result.diseaseInfo.name}</h3>
+                        <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                            <span>Độ tin cậy: <strong>${(result.confidence * 100).toFixed(1)}%</strong></span>
+                            <span>Model: <strong>${result.modelInfo.name}</strong></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                            <div class="bg-leaf-green h-2 rounded-full" style="width: ${result.confidence * 100}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-900 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                                Điều trị
+                            </h4>
+                            <p class="text-blue-800">${result.diseaseInfo.treatment}</p>
+                        </div>
+                        
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-green-900 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Phòng ngừa
+                            </h4>
+                            <p class="text-green-800">${result.diseaseInfo.prevention}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            analysisResults.classList.remove('hidden');
+        }
+
+        function getSeverityColor(severity) {
+            switch(severity) {
+                case 'Không có bệnh': return 'bg-green-100 text-green-800';
+                case 'Trung bình': return 'bg-yellow-100 text-yellow-800';
+                case 'Nghiêm trọng': return 'bg-orange-100 text-orange-800';
+                case 'Rất nghiêm trọng': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function saveToHistory(result) {
+            analysisHistory.unshift(result);
+            if (analysisHistory.length > 50) {
+                analysisHistory = analysisHistory.slice(0, 50);
+            }
+            localStorage.setItem('plantAnalysisHistory', JSON.stringify(analysisHistory));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const historyContainer = document.getElementById('historyContainer');
+            
+            if (analysisHistory.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>Chưa có lịch sử phân tích nào</p>
+                    </div>
+                `;
+                return;
+            }
+
+            historyContainer.innerHTML = `
+                <div class="grid gap-4">
+                    ${analysisHistory.map(item => `
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-start space-x-4">
+                                <img src="${item.image}" alt="Analyzed plant" class="w-20 h-20 object-cover rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="font-semibold text-gray-900">${item.diseaseInfo.name}</h3>
+                                        <span class="text-sm text-gray-500">${item.timestamp}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(item.diseaseInfo.severity)}">
+                                            ${item.diseaseInfo.severity}
+                                        </span>
+                                        <span>Độ tin cậy: ${(item.confidence * 100).toFixed(1)}%</span>
+                                        <span>Model: ${item.modelInfo.name}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(section + '-section').classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-leaf-green', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            event.target.classList.remove('bg-gray-100', 'text-gray-700');
+            event.target.classList.add('bg-leaf-green', 'text-white');
+        }
+    </script>
+
+<!-- ==== Backend bridge injected by setup (do not remove) ==== -->
+<script>
+/**
+ * Bridge FE <-> FastAPI.
+ * - Fetches labels from /labels on load.
+ * - Overrides analyzeImage() to call /infer with the uploaded file.
+ * - Expects existing elements: #imageInput, #modelSelect, #loadingState, #analysisResults.
+ */
+const API_BASE = 'http://127.0.0.1:8000';
+const MODEL_PATHS = {
+  'custom-cnn': 'runs/cnn/cnn_best.h5',
+  'vgg19': 'runs/vgg19/vgg19_best.h5'
+};
+let CLASS_NAMES = [];
+
+// Fetch labels once
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const r = await fetch(`${API_BASE}/labels`);
+    const j = await r.json();
+    CLASS_NAMES = j.labels || [];
+  } catch (e) {
+    console.warn('Không lấy được labels từ server:', e);
+  }
+});
+
+// Override original analyzeImage (if defined)
+window.analyzeImage = async function() {
+  const input = document.getElementById('imageInput');
+  const file = (input && input.files && input.files[0]) || null;
+  if (!file) {
+    alert('Vui lòng chọn một ảnh trước đã.');
+    return;
+  }
+  const loading = document.getElementById('loadingState');
+  const resultsContainer = document.getElementById('resultsContainer');
+  const analysisResults = document.getElementById('analysisResults');
+  loading && loading.classList.remove('hidden');
+  resultsContainer && resultsContainer.classList.add('hidden');
+  analysisResults && analysisResults.classList.add('hidden');
+
+  const selectedModel = document.getElementById('modelSelect')?.value || 'vgg19';
+  const modelPath = MODEL_PATHS[selectedModel];
+  if (!modelPath) {
+    alert('Chưa cấu hình đường dẫn model cho: ' + selectedModel);
+    loading && loading.classList.add('hidden');
+    return;
+  }
+
+  try {
+    const fd = new FormData();
+    fd.append('model_path', modelPath);
+    fd.append('topk', '5');
+    fd.append('image_file', file);
+
+    const res = await fetch(`${API_BASE}/infer`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const preds = data.predictions || [];
+    if (!preds.length) throw new Error('Không nhận được dự đoán từ server.');
+
+    const top1 = preds[0];
+    const label = top1.label || (CLASS_NAMES[top1.class_index] || 'Unknown');
+    const prob = top1.prob;
+
+    // Expecting diseases, models, displayResults, saveToHistory available in your FE
+    const diseaseKey = label;
+    const diseaseInfo = (window.diseases && window.diseases[diseaseKey]) || {
+      name: label,
+      severity: 'Trung bình',
+      treatment: 'Chưa có khuyến nghị chi tiết.',
+      prevention: 'Theo dõi thêm và tối ưu tưới/bón/thoáng khí.'
+    };
+
+    const preview = document.getElementById('previewImg');
+    const result = {
+      id: Date.now(),
+      timestamp: new Date().toLocaleString('vi-VN'),
+      image: preview ? preview.src : null,
+      disease: diseaseKey,
+      diseaseInfo,
+      confidence: prob,
+      model: selectedModel,
+      modelInfo: (window.models && window.models[selectedModel]) || {}
+    };
+
+    if (typeof window.displayResults === 'function') window.displayResults(result);
+    if (typeof window.saveToHistory === 'function') window.saveToHistory(result);
+  } catch (err) {
+    console.error(err);
+    alert('Phân tích thất bại. Kiểm tra server đang chạy và CORS.');
+  } finally {
+    loading && loading.classList.add('hidden');
+  }
+};
+</script>
+</body>
+</html>
